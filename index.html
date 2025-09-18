@@ -3,51 +3,120 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Топ штатов по выручке | Аналитика продаж</title>
+    <title>Аналитика продаж по штатам | Топ выручки</title>
+    <link rel="stylesheet" href="styles.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <div class="container">
         <div class="header">
-            <h1>Топ 10 штатов по выручке</h1>
-            <p class="subtitle">Анализ продаж и эффективности по регионам</p>
+            <h1>Аналитика продаж по штатам</h1>
+            <p class="subtitle">Топ 10 штатов по выручке и общая статистика</p>
         </div>
-
+        
         <div class="controls">
-            <label for="year-select">Показать данные за:</label>
-            <select id="year-select">
-                <option value="all">Все годы</option>
-            </select>
-        </div>
-
-        <div class="table-container">
-            <table id="states-table">
-                <thead>
-                    <tr>
-                        <th>№</th>
-                        <th>Штат</th>
-                        <th>Заказы</th>
-                        <th>Выручка</th>
-                    </tr>
-                </thead>
-                <tbody id="table-body">
-                    <!-- Данные будут загружены через JavaScript -->
-                </tbody>
-            </table>
-
-            <div class="stats-bar">
-                <div class="total-stats">
-                    <div class="total-item">Всего штатов: <span id="total-states">0</span></div>
-                    <div class="total-item">Общая выручка: $<span id="total-revenue">0</span></div>
+            <div class="control-group">
+                <label for="year-select">Показать данные за:</label>
+                <select id="year-select">
+                    <option value="all">Все годы</option>
+                </select>
+            </div>
+            <div class="stats-preview">
+                <div class="stat-card mini">
+                    <span class="stat-label">Общая выручка</span>
+                    <span class="stat-value" id="total-revenue-preview">$0</span>
                 </div>
-                <div class="last-update">Данные обновляются в реальном времени</div>
             </div>
         </div>
 
-        <div class="loading" id="loading">Загрузка данных</div>
+        <div class="dashboard">
+            <div class="stats-cards">
+                <div class="stat-card">
+                    <div class="stat-icon">💰</div>
+                    <div class="stat-info">
+                        <span class="stat-label">Общая выручка</span>
+                        <span class="stat-value" id="total-revenue">$0</span>
+                    </div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-icon">📦</div>
+                    <div class="stat-info">
+                        <span class="stat-label">Всего заказов</span>
+                        <span class="stat-value" id="total-orders">0</span>
+                    </div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-icon">🏢</div>
+                    <div class="stat-info">
+                        <span class="stat-label">Штатов всего</span>
+                        <span class="stat-value" id="total-states">0</span>
+                    </div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-icon">📊</div>
+                    <div class="stat-info">
+                        <span class="stat-label">Средний чек</span>
+                        <span class="stat-value" id="avg-order">$0</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="main-content">
+                <div class="table-section">
+                    <h2>Топ 10 штатов по выручке</h2>
+                    <div class="table-container">
+                        <table id="states-table">
+                            <thead>
+                                <tr>
+                                    <th>№</th>
+                                    <th>Штат</th>
+                                    <th>Заказы</th>
+                                    <th>Выручка</th>
+                                    <th>Доля от общей</th>
+                                </tr>
+                            </thead>
+                            <tbody id="table-body">
+                                <!-- Данные будут загружены через JavaScript -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="additional-stats">
+                    <div class="stats-section">
+                        <h3>Общая статистика за период</h3>
+                        <div class="stats-grid">
+                            <div class="stat-item">
+                                <span class="stat-title">Всего выручка:</span>
+                                <span class="stat-number" id="overall-revenue">$0</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-title">Всего заказов:</span>
+                                <span class="stat-number" id="overall-orders">0</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-title">Штатов в анализе:</span>
+                                <span class="stat-number" id="overall-states">0</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-title">Средняя выручка на штат:</span>
+                                <span class="stat-number" id="avg-state-revenue">$0</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="loading" id="loading">
+            <div class="loading-spinner"></div>
+            <span>Загрузка данных...</span>
+        </div>
     </div>
 
     <script src="script.js"></script>
