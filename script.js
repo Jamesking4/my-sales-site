@@ -4,6 +4,8 @@ class RevenueAnalyzer {
         this.years = new Set();
         this.currentYear = 'all';
         this.totalRevenue = 0;
+        this.topRevenue = 0;
+        this.topFraction = 0;
         this.totalOrders = 0;
         this.totalStates = 0;
         this.init();
@@ -161,9 +163,15 @@ Daniel Young,Corporate,Virginia,Richmond,2023-03-20,Standard,215.00`;
         const totalStates = Object.keys(stateStats).length;
         const avgOrderValue = totalOrders > 0 ? totalRevenue / totalOrders : 0;
         const avgStateRevenue = totalStates > 0 ? totalRevenue / totalStates : 0;
+        const topStates = this.getTopStates(stateStats, totalRevenue);
+
+        let topRevenue = this.getTopRevenue(topStates);
+        let topFraction = topRevenue / totalRevenue * 100;
 
         return {
             totalRevenue,
+            topRevenue,
+            topFraction,
             totalOrders,
             totalStates,
             avgOrderValue,
@@ -184,6 +192,10 @@ Daniel Young,Corporate,Virginia,Richmond,2023-03-20,Standard,215.00`;
             .slice(0, 10);
     }
 
+    getTopRevenue(topStates) {
+         return topStates.reduce((sum, state) => sum + state.revenue, 0);
+    }
+
     updateAllStats() {
         const stats = this.calculateOverallStats();
         const topStates = this.getTopStates(stats.stateStats, stats.totalRevenue);
@@ -196,6 +208,8 @@ Daniel Young,Corporate,Virginia,Richmond,2023-03-20,Standard,215.00`;
 
     updateMainStats(stats) {
         this.formatAndSetValue('total-revenue', stats.totalRevenue, '$');
+        this.formatAndSetValue('top10-revenue', stats.topRevenue, '$');
+        this.formatAndSetValue('top10-fraction-revenue', stats.topFraction, '%');
         this.formatAndSetValue('total-orders', stats.totalOrders, '');
         this.formatAndSetValue('total-states', stats.totalStates, '');
         this.formatAndSetValue('avg-order', stats.avgOrderValue, '$');
@@ -207,6 +221,8 @@ Daniel Young,Corporate,Virginia,Richmond,2023-03-20,Standard,215.00`;
 
     updateOverallStats(stats) {
         this.formatAndSetValue('overall-revenue', stats.totalRevenue, '$');
+        this.formatAndSetValue('top10-revenue', stats.topRevenue, '$');
+        this.formatAndSetValue('top10-fraction-revenue', stats.topFraction, '%');
         this.formatAndSetValue('overall-orders', stats.totalOrders, '');
         this.formatAndSetValue('overall-states', stats.totalStates, '');
         this.formatAndSetValue('avg-state-revenue', stats.avgStateRevenue, '$');
