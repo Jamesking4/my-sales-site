@@ -1,0 +1,663 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Топ штатов по выручке | Аналитика продаж</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-color: #6366f1;
+            --primary-dark: #4f46e5;
+            --secondary-color: #10b981;
+            --accent-color: #f59e0b;
+            --text-primary: #1f2937;
+            --text-secondary: #6b7280;
+            --bg-primary: #f8fafc;
+            --bg-secondary: #ffffff;
+            --border-color: #e5e7eb;
+            --shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+            --shadow-hover: 0 20px 45px -10px rgba(0, 0, 0, 0.15);
+            --gradient: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+        }
+
+        body {
+            font-family: 'Inter', 'Segoe UI', system-ui, sans-serif;
+            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+            color: var(--text-primary);
+            line-height: 1.6;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 30px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            position: relative;
+        }
+
+        h1 {
+            font-size: 2.8rem;
+            font-weight: 800;
+            background: var(--gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 10px;
+            position: relative;
+            display: inline-block;
+        }
+
+        h1::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 60px;
+            height: 4px;
+            background: var(--gradient);
+            border-radius: 2px;
+        }
+
+        .subtitle {
+            color: var(--text-secondary);
+            font-size: 1.1rem;
+            margin-bottom: 30px;
+        }
+
+        .controls {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 40px;
+            gap: 15px;
+            background: var(--bg-secondary);
+            padding: 20px;
+            border-radius: 16px;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border-color);
+        }
+
+        .controls label {
+            font-weight: 600;
+            color: var(--text-primary);
+            font-size: 1.1rem;
+        }
+
+        #year-select {
+            padding: 12px 20px;
+            border: 2px solid var(--border-color);
+            border-radius: 12px;
+            font-size: 1rem;
+            background: var(--bg-primary);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            min-width: 120px;
+            font-weight: 500;
+        }
+
+        #year-select:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+        }
+
+        #year-select:hover {
+            border-color: var(--primary-color);
+        }
+
+        .table-container {
+            background: var(--bg-secondary);
+            border-radius: 20px;
+            box-shadow: var(--shadow);
+            overflow: hidden;
+            border: 1px solid var(--border-color);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .table-container:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-hover);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+        }
+
+        thead {
+            background: var(--gradient);
+        }
+
+        th {
+            padding: 20px;
+            text-align: left;
+            color: white;
+            font-weight: 600;
+            font-size: 0.95rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            position: relative;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+
+        th:hover {
+            background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+        }
+
+        th::after {
+            content: '';
+            position: absolute;
+            right: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 0;
+            height: 0;
+            border-left: 5px solid transparent;
+            border-right: 5px solid transparent;
+            border-top: 5px solid rgba(255, 255, 255, 0.6);
+        }
+
+        td {
+            padding: 18px 20px;
+            border-bottom: 1px solid var(--border-color);
+            font-size: 0.95rem;
+            transition: background 0.2s ease;
+        }
+
+        tbody tr {
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        tbody tr:hover {
+            background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+            transform: translateX(4px);
+        }
+
+        tbody tr:last-child td {
+            border-bottom: none;
+        }
+
+        .rank-cell {
+            font-weight: 700;
+            color: var(--primary-color);
+            text-align: center;
+        }
+
+        .state-cell {
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .orders-cell {
+            text-align: center;
+            color: var(--secondary-color);
+            font-weight: 600;
+        }
+
+        .revenue-cell {
+            text-align: right;
+            color: var(--primary-dark);
+            font-weight: 700;
+            font-size: 1.1rem;
+        }
+
+        tbody tr:nth-child(1) .rank-cell {
+            color: #f59e0b;
+            font-size: 1.2rem;
+        }
+
+        tbody tr:nth-child(2) .rank-cell {
+            color: #6b7280;
+            font-size: 1.1rem;
+        }
+
+        tbody tr:nth-child(3) .rank-cell {
+            color: #b45309;
+            font-size: 1.05rem;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            font-size: 1.1rem;
+            color: var(--text-secondary);
+            background: var(--bg-secondary);
+            border-radius: 16px;
+            margin: 20px 0;
+            box-shadow: var(--shadow);
+        }
+
+        .loading::after {
+            content: '...';
+            animation: dots 1.5s infinite;
+        }
+
+        @keyframes dots {
+            0%, 20% { content: '.'; }
+            40% { content: '..'; }
+            60%, 100% { content: '...'; }
+        }
+
+        .stats-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: var(--bg-secondary);
+            padding: 15px 25px;
+            border-radius: 0 0 20px 20px;
+            border-top: 1px solid var(--border-color);
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        .total-stats {
+            display: flex;
+            gap: 20px;
+        }
+
+        .total-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .total-item::before {
+            content: '';
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: var(--gradient);
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .table-container {
+            animation: fadeIn 0.6s ease-out;
+        }
+
+        tbody tr {
+            animation: fadeIn 0.4s ease-out;
+        }
+
+        tbody tr:nth-child(1) { animation-delay: 0.1s; }
+        tbody tr:nth-child(2) { animation-delay: 0.2s; }
+        tbody tr:nth-child(3) { animation-delay: 0.3s; }
+        tbody tr:nth-child(4) { animation-delay: 0.4s; }
+        tbody tr:nth-child(5) { animation-delay: 0.5s; }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 15px;
+            }
+            
+            h1 {
+                font-size: 2.2rem;
+            }
+            
+            .controls {
+                flex-direction: column;
+                gap: 15px;
+                padding: 15px;
+            }
+            
+            #year-select {
+                width: 100%;
+                max-width: 200px;
+            }
+            
+            th, td {
+                padding: 12px 15px;
+                font-size: 0.9rem;
+            }
+            
+            .table-container {
+                overflow-x: auto;
+            }
+            
+            table {
+                min-width: 600px;
+            }
+            
+            .stats-bar {
+                flex-direction: column;
+                gap: 10px;
+                text-align: center;
+            }
+            
+            .total-stats {
+                justify-content: center;
+            }
+        }
+
+        @media (max-width: 480px) {
+            h1 {
+                font-size: 1.8rem;
+            }
+            
+            .subtitle {
+                font-size: 1rem;
+            }
+            
+            th, td {
+                padding: 10px 12px;
+                font-size: 0.85rem;
+            }
+            
+            .revenue-cell {
+                font-size: 1rem;
+            }
+        }
+
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--bg-primary);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--primary-color);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--primary-dark);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Топ 10 штатов по выручке</h1>
+            <p class="subtitle">Анализ продаж и эффективности по регионам</p>
+        </div>
+        
+        <div class="controls">
+            <label for="year-select">Показать данные за:</label>
+            <select id="year-select">
+                <option value="all">Все годы</option>
+            </select>
+        </div>
+
+        <div class="table-container">
+            <table id="states-table">
+                <thead>
+                    <tr>
+                        <th>№</th>
+                        <th>Штат</th>
+                        <th>Заказы</th>
+                        <th>Выручка</th>
+                    </tr>
+                </thead>
+                <tbody id="table-body">
+                    <!-- Данные будут загружены через JavaScript -->
+                </tbody>
+            </table>
+            
+            <div class="stats-bar">
+                <div class="total-stats">
+                    <div class="total-item">Всего штатов: <span id="total-states">0</span></div>
+                    <div class="total-item">Общая выручка: $<span id="total-revenue">0</span></div>
+                </div>
+                <div class="last-update">Данные обновляются в реальном времени</div>
+            </div>
+        </div>
+
+        <div class="loading" id="loading">Загрузка данных</div>
+    </div>
+
+    <script>
+        // Вставьте сюда содержитие script.js
+        class RevenueAnalyzer {
+            constructor() {
+                this.data = [];
+                this.years = new Set();
+                this.currentYear = 'all';
+                this.init();
+            }
+
+            async init() {
+                try {
+                    await this.loadData();
+                    this.populateYearSelector();
+                    this.updateTable();
+                    this.setupEventListeners();
+                    document.getElementById('loading').style.display = 'none';
+                } catch (error) {
+                    console.error('Ошибка инициализации:', error);
+                    this.showError('Не удалось загрузить данные. Проверьте консоль для подробностей.');
+                }
+            }
+
+            async loadData() {
+                try {
+                    const response = await fetch('orders_customers.csv');
+                    
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                    
+                    const csvData = await response.text();
+                    
+                    if (!csvData || csvData.trim().length === 0) {
+                        throw new Error('CSV файл пустой или содержит неверные данные');
+                    }
+                    
+                    console.log('CSV данные загружены из файла');
+                    this.parseCSV(csvData);
+                    
+                } catch (error) {
+                    console.warn('Ошибка загрузки из файла, используем тестовые данные:', error);
+                    this.useTestData();
+                }
+            }
+
+            useTestData() {
+                const testData = `name,segment,state,city,order_date,ship_mode,sales
+        John Doe,Consumer,California,Los Angeles,2023-01-15,Standard,150.50
+        Jane Smith,Corporate,Texas,Houston,2023-02-20,Express,299.99
+        Bob Johnson,Home Office,Florida,Miami,2023-03-10,Standard,89.99
+        Alice Brown,Consumer,New York,New York,2023-04-05,Express,450.00
+        Mike Wilson,Corporate,California,San Francisco,2023-05-20,Standard,199.99
+        Sarah Davis,Home Office,Texas,Austin,2023-06-15,Express,350.75
+        Tom Miller,Consumer,Illinois,Chicago,2023-07-10,Standard,125.00
+        Emily Taylor,Corporate,Florida,Orlando,2023-08-05,Express,275.50
+        David Anderson,Home Office,Washington,Seattle,2023-09-20,Standard,189.99
+        Lisa Martinez,Consumer,California,San Diego,2023-10-15,Express,420.00
+        James Wilson,Corporate,Texas,Houston,2022-11-10,Standard,230.00
+        Emma Thompson,Home Office,New York,Buffalo,2022-12-05,Express,310.50
+        Robert Garcia,Consumer,Illinois,Chicago,2022-01-20,Standard,95.99
+        Olivia Lee,Corporate,Florida,Tampa,2022-02-15,Express,280.00
+        William Harris,Home Office,California,Los Angeles,2022-03-10,Standard,175.50`;
+
+                console.log('Используются тестовые данные');
+                this.parseCSV(testData);
+            }
+
+            parseCSV(csvData) {
+                const lines = csvData.split('\n').filter(line => line.trim());
+                
+                if (lines.length <= 1) {
+                    throw new Error('CSV файл не содержит данных или имеет неверный формат');
+                }
+
+                const headers = lines[0].split(',').map(header => header.trim());
+                
+                for (let i = 1; i < lines.length; i++) {
+                    const line = lines[i];
+                    if (!line.trim()) continue;
+                    
+                    const values = line.split(',').map(value => value.trim());
+                    
+                    if (values.length === headers.length) {
+                        const order = {};
+                        headers.forEach((header, index) => {
+                            order[header] = values[index];
+                        });
+                        
+                        if (order.order_date) {
+                            const orderDate = new Date(order.order_date);
+                            if (!isNaN(orderDate)) {
+                                order.year = orderDate.getFullYear();
+                                this.years.add(order.year);
+                            }
+                        }
+                        
+                        order.sales = parseFloat(order.sales) || 0;
+                        this.data.push(order);
+                    }
+                }
+                
+                console.log('Загружено записей:', this.data.length);
+                console.log('Найденные годы:', Array.from(this.years));
+            }
+
+            populateYearSelector() {
+                const yearSelect = document.getElementById('year-select');
+                const sortedYears = Array.from(this.years).sort((a, b) => b - a);
+                
+                sortedYears.forEach(year => {
+                    const option = document.createElement('option');
+                    option.value = year;
+                    option.textContent = year;
+                    yearSelect.appendChild(option);
+                });
+            }
+
+            setupEventListeners() {
+                document.getElementById('year-select').addEventListener('change', (e) => {
+                    this.currentYear = e.target.value;
+                    this.updateTable();
+                });
+            }
+
+            getTopStates() {
+                let filteredData = this.data;
+                
+                if (this.currentYear !== 'all') {
+                    const year = parseInt(this.currentYear);
+                    filteredData = this.data.filter(order => order.year === year);
+                }
+
+                const stateStats = {};
+                
+                filteredData.forEach(order => {
+                    if (!order.state) return;
+                    
+                    if (!stateStats[order.state]) {
+                        stateStats[order.state] = {
+                            orders: 0,
+                            revenue: 0
+                        };
+                    }
+                    
+                    stateStats[order.state].orders++;
+                    stateStats[order.state].revenue += order.sales;
+                });
+
+                return Object.entries(stateStats)
+                    .map(([state, stats]) => ({
+                        state,
+                        orders: stats.orders,
+                        revenue: stats.revenue
+                    }))
+                    .sort((a, b) => b.revenue - a.revenue)
+                    .slice(0, 10);
+            }
+
+            updateTable() {
+                const topStates = this.getTopStates();
+                const tableBody = document.getElementById('table-body');
+                
+                tableBody.innerHTML = '';
+                
+                if (topStates.length === 0) {
+                    tableBody.innerHTML = `
+                        <tr>
+                            <td colspan="4" style="text-align: center; color: #666; padding: 40px;">
+                                Нет данных для отображения
+                            </td>
+                        </tr>
+                    `;
+                    this.updateStats(0, 0);
+                    return;
+                }
+                
+                topStates.forEach((stateData, index) => {
+                    const row = document.createElement('tr');
+                    
+                    row.innerHTML = `
+                        <td class="rank-cell">${index + 1}</td>
+                        <td class="state-cell">${stateData.state}</td>
+                        <td class="orders-cell">${stateData.orders.toLocaleString()}</td>
+                        <td class="revenue-cell">$${stateData.revenue.toLocaleString('en-US', {
+                            minimumFractionDigits: 2,
+                            maximumFractionDigits: 2
+                        })}</td>
+                    `;
+                    
+                    tableBody.appendChild(row);
+                });
+
+                this.updateStats(topStates.length, topStates.reduce((sum, state) => sum + state.revenue, 0));
+            }
+
+            updateStats(totalStates, totalRevenue) {
+                document.getElementById('total-states').textContent = totalStates;
+                document.getElementById('total-revenue').textContent = totalRevenue.toLocaleString('en-US', {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2
+                });
+            }
+
+            showError(message) {
+                const tableBody = document.getElementById('table-body');
+                tableBody.innerHTML = `
+                    <tr>
+                        <td colspan="4" style="text-align: center; color: #d32f2f; padding: 40px; font-weight: 500;">
+                            ${message}
+                        </td>
+                    </tr>
+                `;
+                document.getElementById('loading').style.display = 'none';
+                this.updateStats(0, 0);
+            }
+        }
+
+        // Инициализация при загрузке страницы
+        document.addEventListener('DOMContentLoaded', () => {
+            new RevenueAnalyzer();
+        });
+    </script>
+</body>
+</html>
